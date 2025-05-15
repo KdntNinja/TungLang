@@ -30,7 +30,7 @@ block = { "{" ~ statement* ~ "}" }
 // A program is a sequence of statements
 program = { SOI ~ statement* ~ EOI }
 
-// Statements: variable declaration, assignment, augmented assignment, print, if, while, function definition, return
+// Statements: variable declaration, assignment, augmented assignment, print, if, while, function definition, return, function call
 statement = _{
     variable_declaration
     | assignment
@@ -40,6 +40,7 @@ statement = _{
     | while_statement
     | function_definition
     | return_statement
+    | function_call
 }
 
 // Variable declaration: var name = expr
@@ -69,7 +70,7 @@ else_block = { "else" ~ block }
 // While statement: while expr { ... }
 while_statement = { "while" ~ expression ~ block }
 
-// Function definition: fn name(params) { ... }
+// Function definition: fn name(params) block (Rust-like syntax, no parentheses around block)
 function_definition = { "fn" ~ IDENTIFIER ~ "(" ~ (IDENTIFIER ~ ("," ~ IDENTIFIER)*)? ~ ")" ~ block }
 
 // Return statement: return expr

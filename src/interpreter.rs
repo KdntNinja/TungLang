@@ -98,22 +98,33 @@ fn execute_statement(
             let mut inner = pair.into_inner();
             let fn_name = inner.next().unwrap().as_str().to_string();
             let mut params = Vec::new();
-            let param_pair = inner.next().unwrap();
-            if param_pair.as_rule() == Rule::IDENTIFIER {
-                params.push(param_pair.as_str().to_string());
-                for p in param_pair.into_inner() {
-                    params.push(p.as_str().to_string());
+            let mut body = None;
+            if let Some(next) = inner.next() {
+                if next.as_rule() == Rule::IDENTIFIER {
+                    // At least one parameter
+                    params.push(next.as_str().to_string());
+                    for p in next.into_inner() {
+                        params.push(p.as_str().to_string());
+                    }
+                    // The next item must be the body
+                    if let Some(b) = inner.next() {
+                        body = Some(b.as_str().to_string());
+                    }
+                } else if next.as_rule() == Rule::block {
+                    // No parameters, next is body
+                    body = Some(next.as_str().to_string());
                 }
             }
-            let body = inner.next().unwrap();
-            variables.insert(
-                fn_name,
-                Value::Function {
-                    params,
-                    body: body.as_str().to_string(),
-                    env: variables.clone(),
-                },
-            );
+            if let Some(body_str) = body {
+                variables.insert(
+                    fn_name,
+                    Value::Function {
+                        params,
+                        body: body_str,
+                        env: variables.clone(),
+                    },
+                );
+            }
         }
         Rule::return_statement => {
             let value = evaluate_expression(pair.into_inner().next().unwrap(), variables, stdlib)?;
@@ -194,7 +205,7 @@ fn execute_if_statement(
     Ok(())
 }
 
-fn execute_block(
+pub fn execute_block(
     block: Pair<Rule>,
     variables: &mut HashMap<String, Value>,
     stdlib: &StdLib,

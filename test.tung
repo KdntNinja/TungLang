@@ -1,35 +1,5 @@
-tung("Converter:")
-
-capu choice = 0
-capu choices = [1, 2, 3, 4]
-capu symbol = ""
-
-tung("(1) Pounds to Euros")
-tung("(2) Pounds to Dollars")
-tung("(3) Euros to Pounds")
-tung("(4) Dollars to Pounds")
-
-bombadillo choice !in choices {
-    choice = tripi(sahur(": "))
-    la_vaca choice !in choices {
-        tung("Please enter a number shown above.")
-    }
+fn hello() {
+    print("Hello world!")
 }
 
-capu amount = float(sahur("Enter amount to convert: "))
-
-la_vaca choice == 1 {
-    amount *= 1.18
-    symbol = "€"
-} saturno choice == 2 {
-    amount *= 1.27
-    symbol = "$"
-} saturno choice == 3 {
-    amount *= 0.85
-    symbol = "£"
-} saturno choice == 4 {
-    amount *= 0.79
-    symbol = "£"
-}
-
-tung(symbol + str(round(amount, 2)))
+hello()

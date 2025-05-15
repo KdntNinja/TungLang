@@ -1,7 +1,9 @@
+use crate::interpreter::execute_block;
 use crate::parser::Rule;
 use crate::stdlib::StdLib;
 use crate::value::Value;
 use pest::iterators::{Pair, Pairs};
+use pest::Parser;
 use std::collections::HashMap;
 
 pub fn evaluate_expression(
@@ -44,6 +46,36 @@ pub fn evaluate_expression(
             if let Some(func) = stdlib.get(func_name) {
                 let result = func(&args);
                 Ok(result)
+            } else if let Some(Value::Function { params, body, env }) = variables.get(func_name) {
+                // User-defined function call
+                let mut local_vars = env.clone();
+                for (i, param) in params.iter().enumerate() {
+                    if let Some(arg) = args.get(i) {
+                        local_vars.insert(param.clone(), arg.clone());
+                    }
+                }
+                // Parse the function body as a block
+                let parse_result = crate::parser::TungParser::parse(Rule::block, &body);
+                match parse_result {
+                    Ok(mut pairs) => {
+                        let block = pairs.next().unwrap();
+                        match execute_block(block, &mut local_vars, stdlib) {
+                            Ok(_) => Ok(Value::Undefined),
+                            Err(e) => {
+                                let msg = e.to_string();
+                                if msg.starts_with("__RETURN__") {
+                                    // Extract the return value
+                                    // TODO: Actually parse and return the value
+                                    // For now, just return Undefined
+                                    Ok(Value::Undefined)
+                                } else {
+                                    Err(e)
+                                }
+                            }
+                        }
+                    }
+                    Err(e) => Err(miette::miette!("Function parse error: {}", e)),
+                }
             } else {
                 Err(miette::miette!(
                     "Error: Function '{}' is not defined.",
