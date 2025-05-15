@@ -12,6 +12,7 @@ pub fn std_int(val: &Value) -> Value {
         Value::Boolean(true) => Value::Number(1),
         Value::Boolean(false) => Value::Number(0),
         &Value::Array(_) | &Value::Dict(_) => Value::Undefined,
+        Value::Function { .. } => Value::Undefined,
         _ => Value::Undefined,
     }
 }
@@ -46,6 +47,7 @@ pub fn std_str(val: &Value) -> Value {
                 .collect();
             Value::String(format!("{{{}}}", items.join(", ")))
         }
+        &Value::Function { .. } => Value::String("<function>".to_string()),
     }
 }
 
@@ -60,6 +62,7 @@ pub fn std_float(val: &Value) -> Value {
             .unwrap_or(Value::Undefined),
         Value::Boolean(true) => Value::Float(1.0),
         Value::Boolean(false) => Value::Float(0.0),
+        &Value::Function { .. } => Value::Undefined,
         _ => Value::Undefined,
     }
 }
@@ -74,5 +77,6 @@ pub fn std_bool(val: &Value) -> Value {
         Value::Array(arr) => Value::Boolean(!arr.is_empty()),
         Value::Dict(dict) => Value::Boolean(!dict.is_empty()),
         Value::Undefined => Value::Boolean(false),
+        &Value::Function { .. } => Value::Boolean(false),
     }
 }

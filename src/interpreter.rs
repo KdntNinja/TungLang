@@ -67,6 +67,7 @@ fn execute_statement(
                 Value::Boolean(b) => println!("{}", b),
                 Value::Array(arr) => println!("{:?}", arr),
                 Value::Dict(map) => println!("{:?}", map),
+                Value::Function { .. } => println!("<function>"),
                 Value::Undefined => {
                     return Err(miette::miette!("Attempted to print an undefined value."))
                 }
@@ -93,6 +94,31 @@ fn execute_statement(
                 }
             }
         }
+        Rule::function_definition => {
+            let mut inner = pair.into_inner();
+            let fn_name = inner.next().unwrap().as_str().to_string();
+            let mut params = Vec::new();
+            let param_pair = inner.next().unwrap();
+            if param_pair.as_rule() == Rule::IDENTIFIER {
+                params.push(param_pair.as_str().to_string());
+                for p in param_pair.into_inner() {
+                    params.push(p.as_str().to_string());
+                }
+            }
+            let body = inner.next().unwrap();
+            variables.insert(
+                fn_name,
+                Value::Function {
+                    params,
+                    body: body.as_str().to_string(),
+                    env: variables.clone(),
+                },
+            );
+        }
+        Rule::return_statement => {
+            let value = evaluate_expression(pair.into_inner().next().unwrap(), variables, stdlib)?;
+            return Err(miette::miette!("__RETURN__{:?}", value));
+        }
         _ => {}
     }
     Ok(())
@@ -107,6 +133,7 @@ fn is_truthy(value: Value) -> bool {
         Value::Array(ref arr) => !arr.is_empty(),
         Value::Dict(ref map) => !map.is_empty(),
         Value::Undefined => false,
+        Value::Function { .. } => false,
     }
 }
 

@@ -11,5 +11,6 @@ pub fn std_print(val: &Value) {
         Value::Array(arr) => println!("{:?}", arr),
         Value::Dict(map) => println!("{:?}", map),
         Value::Undefined => println!("undefined"),
+        Value::Function { .. } => println!("<function>"),
     }
 }

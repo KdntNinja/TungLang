@@ -14,7 +14,7 @@ pub fn preprocess_code(code: &str) -> String {
         ("saturnita", "else"),
         ("bombadillo", "while"),
         ("tralala", "for"),
-        ("fn", "wa"),
+        ("wa", "fn"),
         // Add more (phrase, replacement) pairs here as needed
     ];
     let mut result = code.to_string();

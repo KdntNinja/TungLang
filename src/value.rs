@@ -7,6 +7,11 @@ pub enum Value {
     Array(Vec<Value>),
     Dict(std::collections::HashMap<String, Value>),
     Undefined, // Added to represent undefined values
+    Function {
+        params: Vec<String>,
+        body: String, // Store the function body as a String
+        env: std::collections::HashMap<String, Value>,
+    },
 }
 
 pub type BuiltinFn = fn(&[Value]) -> Value;
@@ -52,6 +57,11 @@ impl std::fmt::Display for Value {
                 write!(f, "}}")
             }
             Value::Undefined => write!(f, "undefined"),
+            Value::Function {
+                params: _,
+                body: _,
+                env: _,
+            } => write!(f, "Function"),
         }
     }
 }
