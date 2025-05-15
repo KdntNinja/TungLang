@@ -8,7 +8,7 @@ TungLang supports both standard keywords and their Italian Brainrot-themed alter
 
 To add new keyword aliases, modify the `FUNCTION_ALIASES` and `CONTROL_ALIASES` `HashMap`s in the `keywords.rs` file.
 
-| **Python Keyword** | **TungLang Alias**  |
+| **General Keyword** | **TungLang Alias**  |
 |:------------------:|:------------------:|
 | `var`              | `capu`             |
 | `print()`          | `tung()`           |
@@ -20,3 +20,4 @@ To add new keyword aliases, modify the `FUNCTION_ALIASES` and `CONTROL_ALIASES` 
 | `else`             | `saturnita`        |
 | `while`            | `bombadillo`       |
 | `for`              | `tralala`          |
+| `fn`               | `wa`               |

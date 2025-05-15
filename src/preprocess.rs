@@ -4,7 +4,7 @@ use regex::Regex;
 /// Automatically adds `\b` and `\s*` to either side of the phrase for easier expansion.
 pub fn preprocess_code(code: &str) -> String {
     let replacements = vec![
-        ("")
+        ("capu", "var"),
         ("tung(", "print("),
         ("sahur(", "input("),
         ("tripi(", "int("),
@@ -14,6 +14,7 @@ pub fn preprocess_code(code: &str) -> String {
         ("saturnita", "else"),
         ("bombadillo", "while"),
         ("tralala", "for"),
+        ("fn", "wa"),
         // Add more (phrase, replacement) pairs here as needed
     ];
     let mut result = code.to_string();
