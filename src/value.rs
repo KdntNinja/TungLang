@@ -1,23 +1,10 @@
-#[derive(Debug, Clone, PartialEq)]
-pub enum Value {
-    Number(i64),
-    Float(f64),
-    String(String),
-    Boolean(bool),
-    Array(Vec<Value>),
-    Dict(std::collections::HashMap<String, Value>),
-    Undefined, // Added to represent undefined values
-    Function {
-        params: Vec<String>,
-        body: String, // Store the function body as a String
-        env: std::collections::HashMap<String, Value>,
-    },
-}
-
-pub type BuiltinFn = fn(&[Value]) -> Value;
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Number(pub i64);
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct Float(pub f64);
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct StringValue(pub String);
@@ -25,13 +12,34 @@ pub struct StringValue(pub String);
 #[derive(Debug, Clone, PartialEq)]
 pub struct BooleanValue(pub bool);
 
+pub type Array = Vec<Value>;
+pub type Dict = HashMap<String, Value>;
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum Value {
+    Number(Number),
+    Float(Float),
+    String(StringValue),
+    Boolean(BooleanValue),
+    Array(Array),
+    Dict(Dict),
+    Undefined,
+    Function {
+        params: Vec<String>,
+        body: String,
+        env: Dict,
+    },
+}
+
+pub type BuiltinFn = fn(args: &[Value]) -> Value;
+
 impl std::fmt::Display for Value {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Value::Number(n) => write!(f, "{}", n),
-            Value::Float(n) => write!(f, "{}", n),
-            Value::String(s) => write!(f, "{}", s),
-            Value::Boolean(b) => write!(f, "{}", b),
+            Value::Number(Number(n)) => write!(f, "{}", n),
+            Value::Float(Float(n)) => write!(f, "{}", n),
+            Value::String(StringValue(s)) => write!(f, "{}", s),
+            Value::Boolean(BooleanValue(b)) => write!(f, "{}", b),
             Value::Array(a) => {
                 write!(f, "[")?;
                 let mut first = true;
@@ -57,11 +65,7 @@ impl std::fmt::Display for Value {
                 write!(f, "}}")
             }
             Value::Undefined => write!(f, "undefined"),
-            Value::Function {
-                params: _,
-                body: _,
-                env: _,
-            } => write!(f, "Function"),
+            Value::Function { .. } => write!(f, "Function"),
         }
     }
 }

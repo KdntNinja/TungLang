@@ -1,6 +1,6 @@
 // file: /home/kaiden/RustroverProjects/TungLang/src/eval/std_list.rs
 // Python-like list functions for TungLang
-use crate::value::Value;
+use crate::value::{Value, Number, Float, StringValue, BooleanValue};
 
 // append function (modifies list in-place like Python's list.append())
 pub fn std_append(args: &[Value]) -> Value {
@@ -24,7 +24,7 @@ pub fn std_insert(args: &[Value]) -> Value {
     }
 
     match (args[0].clone(), &args[1]) {
-        (Value::Array(mut arr), Value::Number(idx)) => {
+        (Value::Array(mut arr), Value::Number(Number(idx))) => {
             let index = if *idx < 0 {
                 arr.len().saturating_sub(idx.unsigned_abs() as usize)
             } else {
@@ -53,7 +53,7 @@ pub fn std_pop(args: &[Value]) -> Value {
 
             let idx = if args.len() > 1 {
                 match args[1] {
-                    Value::Number(n) => {
+                    Value::Number(Number(n)) => {
                         if n < 0 {
                             arr.len().saturating_sub(n.unsigned_abs() as usize)
                         } else {
@@ -87,19 +87,19 @@ pub fn std_index(args: &[Value]) -> Value {
         Value::Array(arr) => {
             for (i, item) in arr.iter().enumerate() {
                 if item == &args[1] {
-                    return Value::Number(i as i64);
+                    return Value::Number(Number(i as i64));
                 }
             }
-            Value::Number(-1)
+            Value::Number(Number(-1))
         }
-        Value::String(s) => {
-            if let Value::String(substr) = &args[1] {
+        Value::StringValue(StringValue(s)) => {
+            if let Value::StringValue(StringValue(substr)) = &args[1] {
                 match s.find(substr) {
-                    Some(idx) => Value::Number(idx as i64),
-                    None => Value::Number(-1),
+                    Some(idx) => Value::Number(Number(idx as i64)),
+                    None => Value::Number(Number(-1)),
                 }
             } else {
-                Value::Number(-1)
+                Value::Number(Number(-1))
             }
         }
         _ => Value::Undefined,
@@ -115,17 +115,17 @@ pub fn std_sort(args: &[Value]) -> Value {
     match args[0].clone() {
         Value::Array(mut arr) => {
             arr.sort_by(|a, b| match (a, b) {
-                (Value::Number(n1), Value::Number(n2)) => n1.cmp(n2),
-                (Value::Float(f1), Value::Float(f2)) => {
+                (Value::Number(Number(n1)), Value::Number(Number(n2))) => n1.cmp(n2),
+                (Value::Float(Float(f1)), Value::Float(Float(f2))) => {
                     f1.partial_cmp(f2).unwrap_or(std::cmp::Ordering::Equal)
                 }
-                (Value::Number(n), Value::Float(f)) => (*n as f64)
+                (Value::Number(Number(n)), Value::Float(Float(f))) => (*n as f64)
                     .partial_cmp(f)
                     .unwrap_or(std::cmp::Ordering::Equal),
-                (Value::Float(f), Value::Number(n)) => f
+                (Value::Float(Float(f)), Value::Number(Number(n))) => f
                     .partial_cmp(&(*n as f64))
                     .unwrap_or(std::cmp::Ordering::Equal),
-                (Value::String(s1), Value::String(s2)) => s1.cmp(s2),
+                (Value::StringValue(StringValue(s1)), Value::StringValue(StringValue(s2))) => s1.cmp(s2),
                 _ => std::cmp::Ordering::Equal,
             });
             Value::Array(arr)

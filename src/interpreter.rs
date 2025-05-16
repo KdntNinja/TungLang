@@ -1,7 +1,7 @@
 use crate::eval::evaluate_expression::evaluate_expression;
 use crate::parser::Rule;
 use crate::stdlib::StdLib;
-use crate::value::Value;
+use crate::value::{Value, Number, Float, StringValue, BooleanValue, Array, Dict};
 use pest::iterators::{Pair, Pairs};
 use std::collections::HashMap;
 
@@ -61,10 +61,10 @@ fn execute_statement(
             let mut inner: Pairs<Rule> = pair.into_inner();
             let value: Value = evaluate_expression(inner.next().unwrap(), variables, stdlib)?;
             match value {
-                Value::String(s) => println!("{}", s),
-                Value::Number(n) => println!("{}", n),
-                Value::Float(f) => println!("{}", f),
-                Value::Boolean(b) => println!("{}", b),
+                Value::String(StringValue(s)) => println!("{}", s),
+                Value::Number(Number(n)) => println!("{}", n),
+                Value::Float(Float(f)) => println!("{}", f),
+                Value::Boolean(BooleanValue(b)) => println!("{}", b),
                 Value::Array(arr) => println!("{:?}", arr),
                 Value::Dict(map) => println!("{:?}", map),
                 Value::Function { .. } => println!("<function>"),
@@ -137,10 +137,10 @@ fn execute_statement(
 
 fn is_truthy(value: Value) -> bool {
     match value {
-        Value::Number(n) => n != 0,
-        Value::Float(f) => f != 0.0,
-        Value::String(ref s) => !s.is_empty(),
-        Value::Boolean(b) => b,
+        Value::Number(Number(n)) => n != 0,
+        Value::Float(Float(f)) => f != 0.0,
+        Value::String(StringValue(ref s)) => !s.is_empty(),
+        Value::Boolean(BooleanValue(b)) => b,
         Value::Array(ref arr) => !arr.is_empty(),
         Value::Dict(ref map) => !map.is_empty(),
         Value::Undefined => false,

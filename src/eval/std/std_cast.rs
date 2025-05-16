@@ -1,82 +1,81 @@
 // Handles Python-like type conversion functions
-use crate::value::Value;
+use crate::value::{Value, Number, Float, StringValue, BooleanValue};
 
 pub fn std_int(val: &Value) -> Value {
     match val {
-        Value::Number(n) => Value::Number(*n),
-        Value::Float(f) => Value::Number(*f as i64),
-        Value::String(s) => s
+        Value::Number(Number(n)) => Value::Number(Number(*n)),
+        Value::Float(Float(f)) => Value::Number(Number(*f as i64)),
+        Value::String(StringValue(s)) => s
             .parse::<i64>()
-            .map(Value::Number)
+            .map(|n| Value::Number(Number(n)))
             .unwrap_or(Value::Undefined),
-        Value::Boolean(true) => Value::Number(1),
-        Value::Boolean(false) => Value::Number(0),
-        &Value::Array(_) | &Value::Dict(_) => Value::Undefined,
+        Value::Boolean(BooleanValue(true)) => Value::Number(Number(1)),
+        Value::Boolean(BooleanValue(false)) => Value::Number(Number(0)),
+        Value::Array(_) | Value::Dict(_) => Value::Undefined,
         Value::Function { .. } => Value::Undefined,
-        _ => Value::Undefined,
+        Value::Undefined => Value::Undefined,
     }
 }
 
 pub fn std_str(val: &Value) -> Value {
     match val {
-        Value::String(s) => Value::String(s.clone()),
-        Value::Number(n) => Value::String(n.to_string()),
-        Value::Float(f) => Value::String(f.to_string()),
-        Value::Boolean(b) => Value::String(b.to_string()),
-        Value::Undefined => Value::String("undefined".to_string()),
+        Value::String(StringValue(s)) => Value::String(StringValue(s.clone())),
+        Value::Number(Number(n)) => Value::String(StringValue(n.to_string())),
+        Value::Float(Float(f)) => Value::String(StringValue(f.to_string())),
+        Value::Boolean(BooleanValue(b)) => Value::String(StringValue(b.to_string())),
+        Value::Undefined => Value::String(StringValue("undefined".to_string())),
         Value::Array(arr) => {
             let items: Vec<String> = arr
                 .iter()
                 .map(|v| match v {
-                    Value::String(s) => format!("\"{}\"", s),
+                    Value::String(StringValue(s)) => format!("\"{}\"", s),
                     _ => format!("{}", v),
                 })
                 .collect();
-            Value::String(format!("[{}]", items.join(", ")))
+            Value::String(StringValue(format!("[{}]", items.join(", "))))
         }
         Value::Dict(map) => {
             let items: Vec<String> = map
                 .iter()
                 .map(|(k, v)| {
                     let value_str = match v {
-                        Value::String(s) => format!("\"{}\"", s),
+                        Value::String(StringValue(s)) => format!("\"{}\"", s),
                         _ => format!("{}", v),
                     };
                     format!("\"{}\": {}", k, value_str)
                 })
                 .collect();
-            Value::String(format!("{{{}}}", items.join(", ")))
+            Value::String(StringValue(format!("{{{}}}", items.join(", "))))
         }
-        &Value::Function { .. } => Value::String("<function>".to_string()),
+        Value::Function { .. } => Value::String(StringValue("<function>".to_string())),
     }
 }
 
-// Convert to float (Python-like)
 pub fn std_float(val: &Value) -> Value {
     match val {
-        Value::Float(f) => Value::Float(*f),
-        Value::Number(n) => Value::Float(*n as f64),
-        Value::String(s) => s
+        Value::Float(Float(f)) => Value::Float(Float(*f)),
+        Value::Number(Number(n)) => Value::Float(Float(*n as f64)),
+        Value::String(StringValue(s)) => s
             .parse::<f64>()
-            .map(Value::Float)
+            .map(|f| Value::Float(Float(f)))
             .unwrap_or(Value::Undefined),
-        Value::Boolean(true) => Value::Float(1.0),
-        Value::Boolean(false) => Value::Float(0.0),
-        &Value::Function { .. } => Value::Undefined,
-        _ => Value::Undefined,
+        Value::Boolean(BooleanValue(true)) => Value::Float(Float(1.0)),
+        Value::Boolean(BooleanValue(false)) => Value::Float(Float(0.0)),
+        Value::Function { .. } => Value::Undefined,
+        Value::Array(_) | Value::Dict(_) => Value::Undefined,
+        Value::Undefined => Value::Undefined,
     }
 }
 
-// Convert to boolean (Python-like)
 pub fn std_bool(val: &Value) -> Value {
     match val {
-        Value::Boolean(b) => Value::Boolean(*b),
-        Value::Number(n) => Value::Boolean(*n != 0),
-        Value::Float(f) => Value::Boolean(*f != 0.0),
-        Value::String(s) => Value::Boolean(!s.is_empty()),
-        Value::Array(arr) => Value::Boolean(!arr.is_empty()),
-        Value::Dict(dict) => Value::Boolean(!dict.is_empty()),
-        Value::Undefined => Value::Boolean(false),
-        &Value::Function { .. } => Value::Boolean(false),
+        Value::Boolean(BooleanValue(b)) => Value::Boolean(BooleanValue(*b)),
+        Value::Number(Number(n)) => Value::Boolean(BooleanValue(*n != 0)),
+        Value::Float(Float(f)) => Value::Boolean(BooleanValue(*f != 0.0)),
+        Value::String(StringValue(s)) => Value::Boolean(BooleanValue(!s.is_empty())),
+        Value::Array(arr) => Value::Boolean(BooleanValue(!arr.is_empty())),
+        Value::Dict(dict) => Value::Boolean(BooleanValue(!dict.is_empty())),
+        Value::Undefined => Value::Boolean(BooleanValue(false)),
+        Value::Function { .. } => Value::Boolean(BooleanValue(false)),
     }
 }

@@ -1,10 +1,10 @@
 // Handles the TungLang input() built-in function
-use crate::value::Value;
+use crate::value::{Value, StringValue};
 use std::io::{self, Write};
 
-/// Prompts the user and returns their input as a Value (Number, Float, or String)
+/// Prompts the user and returns their input as a Value (Number, Float, or StringValue)
 pub fn std_input(prompt: &Value) -> Value {
-    if let Value::String(prompt) = prompt {
+    if let Value::StringValue(prompt) = prompt {
         print!("{}", prompt);
         io::stdout().flush().unwrap();
     }
@@ -16,6 +16,6 @@ pub fn std_input(prompt: &Value) -> Value {
     } else if let Ok(f) = input.parse::<f64>() {
         Value::Float(f)
     } else {
-        Value::String(input.to_string())
+        Value::StringValue(input.to_string())
     }
 }

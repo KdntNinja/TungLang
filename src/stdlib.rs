@@ -7,7 +7,7 @@ use crate::eval::std::std_list;
 use crate::eval::std::std_math;
 use crate::eval::std::std_print::std_print;
 use crate::eval::std::std_range;
-use crate::value::{BuiltinFn, Value};
+use crate::value::{Value, BuiltinFn, Array, Dict, Number, Float, StringValue, BooleanValue};
 use std::collections::HashMap;
 
 pub struct StdLib {
@@ -20,32 +20,32 @@ impl StdLib {
 
         // Basic functions
         functions.insert("input", |args: &[Value]| {
-            std_input(args.get(0).unwrap_or(&Value::String(String::new())))
+            std_input(args.get(0).unwrap_or(&Value::String(StringValue::new(String::new()))))
         });
         functions.insert("print", |args: &[Value]| {
-            std_print(args.get(0).unwrap_or(&Value::String(String::new())));
-            Value::Number(0)
+            std_print(args.get(0).unwrap_or(&Value::String(StringValue::new(String::new()))));
+            Value::Number(Number::new(0))
         });
         functions.insert("abs", |args: &[Value]| {
-            std_abs(args.get(0).unwrap_or(&Value::Number(0)))
+            std_abs(args.get(0).unwrap_or(&Value::Number(Number::new(0))))
         });
         functions.insert("len", |args: &[Value]| {
-            std_len(args.get(0).unwrap_or(&Value::String(String::new())))
+            std_len(args.get(0).unwrap_or(&Value::String(StringValue::new(String::new()))))
         });
         functions.insert("range", std_range::std_range);
 
         // Type conversion functions (like Python)
         functions.insert("int", |args: &[Value]| {
-            std_cast::std_int(args.get(0).unwrap_or(&Value::Number(0)))
+            std_cast::std_int(args.get(0).unwrap_or(&Value::Number(Number::new(0))))
         });
         functions.insert("str", |args: &[Value]| {
-            std_cast::std_str(args.get(0).unwrap_or(&Value::String(String::new())))
+            std_cast::std_str(args.get(0).unwrap_or(&Value::String(StringValue::new(String::new()))))
         });
         functions.insert("float", |args: &[Value]| {
-            std_cast::std_float(args.get(0).unwrap_or(&Value::Number(0)))
+            std_cast::std_float(args.get(0).unwrap_or(&Value::Number(Number::new(0))))
         });
         functions.insert("bool", |args: &[Value]| {
-            std_cast::std_bool(args.get(0).unwrap_or(&Value::Number(0)))
+            std_cast::std_bool(args.get(0).unwrap_or(&Value::Number(Number::new(0))))
         });
 
         // Math functions (like Python)

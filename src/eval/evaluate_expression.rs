@@ -1,14 +1,14 @@
 use crate::interpreter::execute_block;
 use crate::parser::Rule;
 use crate::stdlib::StdLib;
-use crate::value::Value;
+use crate::value::{Value, Number, Float, StringValue, BooleanValue, Array, Dict};
 use pest::iterators::{Pair, Pairs};
 use pest::Parser;
 use std::collections::HashMap;
 
 pub fn evaluate_expression(
     pair: Pair<Rule>,
-    variables: &HashMap<String, Value>,
+    variables: &Dict,
     stdlib: &StdLib,
 ) -> miette::Result<Value> {
     use crate::eval::operators::apply_operator;
@@ -17,14 +17,14 @@ pub fn evaluate_expression(
         Rule::number => {
             let s: &str = pair.as_str();
             if s.contains('.') {
-                Ok(Value::Float(s.parse::<f64>().unwrap()))
+                Ok(Value::Float(Float(s.parse::<f64>().unwrap())))
             } else {
-                Ok(Value::Number(s.parse::<i64>().unwrap()))
+                Ok(Value::Number(Number(s.parse::<i64>().unwrap())))
             }
         }
         Rule::string => {
             let s: &str = pair.as_str();
-            Ok(Value::String(s[1..s.len() - 1].to_string()))
+            Ok(Value::String(StringValue(s[1..s.len() - 1].to_string())))
         }
         Rule::IDENTIFIER => {
             let name: &str = pair.as_str();
@@ -39,7 +39,7 @@ pub fn evaluate_expression(
         Rule::function_call => {
             let mut inner: Pairs<Rule> = pair.into_inner();
             let func_name: &str = inner.next().unwrap().as_str();
-            let mut args = Vec::new();
+            let mut args: Vec<Value> = Vec::new();
             for p in inner {
                 args.push(evaluate_expression(p, variables, stdlib)?);
             }
@@ -47,14 +47,12 @@ pub fn evaluate_expression(
                 let result = func(&args);
                 Ok(result)
             } else if let Some(Value::Function { params, body, env }) = variables.get(func_name) {
-                // User-defined function call
-                let mut local_vars = env.clone();
+                let mut local_vars: Dict = env.clone();
                 for (i, param) in params.iter().enumerate() {
                     if let Some(arg) = args.get(i) {
                         local_vars.insert(param.clone(), arg.clone());
                     }
                 }
-                // Parse the function body as a block
                 let parse_result = crate::parser::TungParser::parse(Rule::block, &body);
                 match parse_result {
                     Ok(mut pairs) => {
@@ -64,10 +62,16 @@ pub fn evaluate_expression(
                             Err(e) => {
                                 let msg = e.to_string();
                                 if msg.starts_with("__RETURN__") {
-                                    // Extract the return value
-                                    // TODO: Actually parse and return the value
-                                    // For now, just return Undefined
-                                    Ok(Value::Undefined)
+                                    let return_str = msg.trim_start_matches("__RETURN__").trim();
+                                    let parse_result = crate::parser::TungParser::parse(Rule::expression, return_str);
+                                    match parse_result {
+                                        Ok(mut pairs) => {
+                                            let expr = pairs.next().unwrap();
+                                            let val = evaluate_expression(expr, &local_vars, stdlib)?;
+                                            Ok(val)
+                                        }
+                                        Err(_) => Ok(Value::Undefined),
+                                    }
                                 } else {
                                     Err(e)
                                 }
@@ -99,14 +103,14 @@ pub fn evaluate_expression(
             evaluate_expression(first, variables, stdlib)
         }
         Rule::array => {
-            let mut elements = Vec::new();
+            let mut elements: Array = Vec::new();
             for p in pair.into_inner() {
                 elements.push(evaluate_expression(p, variables, stdlib)?);
             }
             Ok(Value::Array(elements))
         }
         Rule::dict => {
-            let mut map: HashMap<String, Value> = HashMap::new();
+            let mut map: Dict = Dict::new();
             for entry in pair.into_inner() {
                 let mut kv: Pairs<Rule> = entry.into_inner();
                 let k: String = kv.next().unwrap().as_str().to_string();
