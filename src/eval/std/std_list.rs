@@ -92,9 +92,9 @@ pub fn std_index(args: &[Value]) -> Value {
             }
             Value::Number(Number(-1))
         }
-        Value::StringValue(StringValue(s)) => {
-            if let Value::StringValue(StringValue(substr)) = &args[1] {
-                match s.find(substr) {
+        Value::String(s) => {
+            if let Value::String(substr) = &args[1] {
+                match s.0.find(&substr.0) {
                     Some(idx) => Value::Number(Number(idx as i64)),
                     None => Value::Number(Number(-1)),
                 }
@@ -125,7 +125,7 @@ pub fn std_sort(args: &[Value]) -> Value {
                 (Value::Float(Float(f)), Value::Number(Number(n))) => f
                     .partial_cmp(&(*n as f64))
                     .unwrap_or(std::cmp::Ordering::Equal),
-                (Value::StringValue(StringValue(s1)), Value::StringValue(StringValue(s2))) => s1.cmp(s2),
+                (Value::String(s1), Value::String(s2)) => s1.cmp(s2),
                 _ => std::cmp::Ordering::Equal,
             });
             Value::Array(arr)

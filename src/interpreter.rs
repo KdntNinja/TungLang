@@ -61,10 +61,10 @@ fn execute_statement(
             let mut inner: Pairs<Rule> = pair.into_inner();
             let value: Value = evaluate_expression(inner.next().unwrap(), variables, stdlib)?;
             match value {
-                Value::String(StringValue(s)) => println!("{}", s),
-                Value::Number(Number(n)) => println!("{}", n),
-                Value::Float(Float(f)) => println!("{}", f),
-                Value::Boolean(BooleanValue(b)) => println!("{}", b),
+                Value::String(s) => println!("{}", s),
+                Value::Number(n) => println!("{}", n),
+                Value::Float(f) => println!("{}", f),
+                Value::Boolean(b) => println!("{}", b),
                 Value::Array(arr) => println!("{:?}", arr),
                 Value::Dict(map) => println!("{:?}", map),
                 Value::Function { .. } => println!("<function>"),
@@ -137,10 +137,10 @@ fn execute_statement(
 
 fn is_truthy(value: Value) -> bool {
     match value {
-        Value::Number(Number(n)) => n != 0,
-        Value::Float(Float(f)) => f != 0.0,
-        Value::String(StringValue(ref s)) => !s.is_empty(),
-        Value::Boolean(BooleanValue(b)) => b,
+        Value::Number(n) => n.0 != 0,
+        Value::Float(f) => f.0 != 0.0,
+        Value::String(s) => !s.0.is_empty(),
+        Value::Boolean(b) => b.0,
         Value::Array(ref arr) => !arr.is_empty(),
         Value::Dict(ref map) => !map.is_empty(),
         Value::Undefined => false,

@@ -3,9 +3,9 @@ use crate::value::{Value, Number, Float, StringValue, BooleanValue};
 
 pub fn std_int(val: &Value) -> Value {
     match val {
-        Value::Number(Number(n)) => Value::Number(Number(*n)),
-        Value::Float(Float(f)) => Value::Number(Number(*f as i64)),
-        Value::String(StringValue(s)) => s
+        Value::Number(n) => Value::Number(Number(n.0)),
+        Value::Float(f) => Value::Number(Number(f.0 as i64)),
+        Value::String(s) => s.0
             .parse::<i64>()
             .map(|n| Value::Number(Number(n)))
             .unwrap_or(Value::Undefined),
@@ -19,16 +19,16 @@ pub fn std_int(val: &Value) -> Value {
 
 pub fn std_str(val: &Value) -> Value {
     match val {
-        Value::String(StringValue(s)) => Value::String(StringValue(s.clone())),
-        Value::Number(Number(n)) => Value::String(StringValue(n.to_string())),
-        Value::Float(Float(f)) => Value::String(StringValue(f.to_string())),
-        Value::Boolean(BooleanValue(b)) => Value::String(StringValue(b.to_string())),
+        Value::String(s) => Value::String(StringValue(s.0.clone())),
+        Value::Number(n) => Value::String(StringValue(n.to_string())),
+        Value::Float(f) => Value::String(StringValue(f.to_string())),
+        Value::Boolean(b) => Value::String(StringValue(b.to_string())),
         Value::Undefined => Value::String(StringValue("undefined".to_string())),
         Value::Array(arr) => {
             let items: Vec<String> = arr
                 .iter()
                 .map(|v| match v {
-                    Value::String(StringValue(s)) => format!("\"{}\"", s),
+                    Value::String(s) => format!("\"{}\"", s),
                     _ => format!("{}", v),
                 })
                 .collect();
@@ -39,7 +39,7 @@ pub fn std_str(val: &Value) -> Value {
                 .iter()
                 .map(|(k, v)| {
                     let value_str = match v {
-                        Value::String(StringValue(s)) => format!("\"{}\"", s),
+                        Value::String(s) => format!("\"{}\"", s),
                         _ => format!("{}", v),
                     };
                     format!("\"{}\": {}", k, value_str)
@@ -53,9 +53,9 @@ pub fn std_str(val: &Value) -> Value {
 
 pub fn std_float(val: &Value) -> Value {
     match val {
-        Value::Float(Float(f)) => Value::Float(Float(*f)),
-        Value::Number(Number(n)) => Value::Float(Float(*n as f64)),
-        Value::String(StringValue(s)) => s
+        Value::Float(f) => Value::Float(Float(f.0)),
+        Value::Number(n) => Value::Float(Float(n.0 as f64)),
+        Value::String(s) => s.0
             .parse::<f64>()
             .map(|f| Value::Float(Float(f)))
             .unwrap_or(Value::Undefined),
@@ -69,10 +69,10 @@ pub fn std_float(val: &Value) -> Value {
 
 pub fn std_bool(val: &Value) -> Value {
     match val {
-        Value::Boolean(BooleanValue(b)) => Value::Boolean(BooleanValue(*b)),
-        Value::Number(Number(n)) => Value::Boolean(BooleanValue(*n != 0)),
-        Value::Float(Float(f)) => Value::Boolean(BooleanValue(*f != 0.0)),
-        Value::String(StringValue(s)) => Value::Boolean(BooleanValue(!s.is_empty())),
+        Value::Boolean(b) => Value::Boolean(BooleanValue(b.0)),
+        Value::Number(n) => Value::Boolean(BooleanValue(n.0 != 0)),
+        Value::Float(f) => Value::Boolean(BooleanValue(f.0 != 0.0)),
+        Value::String(s) => Value::Boolean(BooleanValue(!s.0.is_empty())),
         Value::Array(arr) => Value::Boolean(BooleanValue(!arr.is_empty())),
         Value::Dict(dict) => Value::Boolean(BooleanValue(!dict.is_empty())),
         Value::Undefined => Value::Boolean(BooleanValue(false)),
