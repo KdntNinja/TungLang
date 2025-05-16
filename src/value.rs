@@ -1,90 +1,117 @@
 use std::collections::HashMap;
 
-
-use std::ops::{Add, Sub, Mul, Div, Rem, Neg, Not};
-use std::cmp::{PartialEq, Eq, PartialOrd, Ord, Ordering};
+use std::cmp::{Eq, Ord, Ordering, PartialEq, PartialOrd};
 use std::hash::{Hash, Hasher};
+use std::ops::{Add, Div, Mul, Neg, Not, Rem, Sub};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct Number(pub i64);
+pub struct Integer(pub i64);
 
-impl Number {
-    pub fn new(n: i64) -> Self { Number(n) }
+impl Integer {
+    pub fn new(value: i64) -> Self {
+        Integer(value)
+    }
 }
 
-impl Add for Number {
-    type Output = Number;
-    fn add(self, rhs: Number) -> Number { Number(self.0 + rhs.0) }
+impl Add for Integer {
+    type Output = Integer;
+    fn add(self, rhs: Integer) -> Integer {
+        Integer(self.0 + rhs.0)
+    }
 }
-impl Sub for Number {
-    type Output = Number;
-    fn sub(self, rhs: Number) -> Number { Number(self.0 - rhs.0) }
+impl Sub for Integer {
+    type Output = Integer;
+    fn sub(self, rhs: Integer) -> Integer {
+        Integer(self.0 - rhs.0)
+    }
 }
-impl Mul for Number {
-    type Output = Number;
-    fn mul(self, rhs: Number) -> Number { Number(self.0 * rhs.0) }
+impl Mul for Integer {
+    type Output = Integer;
+    fn mul(self, rhs: Integer) -> Integer {
+        Integer(self.0 * rhs.0)
+    }
 }
-impl Div for Number {
-    type Output = Number;
-    fn div(self, rhs: Number) -> Number { Number(self.0 / rhs.0) }
+impl Div for Integer {
+    type Output = Integer;
+    fn div(self, rhs: Integer) -> Integer {
+        Integer(self.0 / rhs.0)
+    }
 }
-impl Rem for Number {
-    type Output = Number;
-    fn rem(self, rhs: Number) -> Number { Number(self.0 % rhs.0) }
+impl Rem for Integer {
+    type Output = Integer;
+    fn rem(self, rhs: Integer) -> Integer {
+        Integer(self.0 % rhs.0)
+    }
 }
-impl Neg for Number {
-    type Output = Number;
-    fn neg(self) -> Number { Number(-self.0) }
+impl Neg for Integer {
+    type Output = Integer;
+    fn neg(self) -> Integer {
+        Integer(-self.0)
+    }
 }
-impl std::fmt::Display for Number {
+impl std::fmt::Display for Integer {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.0)
     }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
-pub struct Float(pub f64);
+pub struct FloatNumber(pub f64);
 
-impl Float {
-    pub fn new(f: f64) -> Self { Float(f) }
+impl FloatNumber {
+    pub fn new(value: f64) -> Self {
+        FloatNumber(value)
+    }
 }
 
-impl Add for Float {
-    type Output = Float;
-    fn add(self, rhs: Float) -> Float { Float(self.0 + rhs.0) }
+impl Add for FloatNumber {
+    type Output = FloatNumber;
+    fn add(self, rhs: FloatNumber) -> FloatNumber {
+        FloatNumber(self.0 + rhs.0)
+    }
 }
-impl Sub for Float {
-    type Output = Float;
-    fn sub(self, rhs: Float) -> Float { Float(self.0 - rhs.0) }
+impl Sub for FloatNumber {
+    type Output = FloatNumber;
+    fn sub(self, rhs: FloatNumber) -> FloatNumber {
+        FloatNumber(self.0 - rhs.0)
+    }
 }
-impl Mul for Float {
-    type Output = Float;
-    fn mul(self, rhs: Float) -> Float { Float(self.0 * rhs.0) }
+impl Mul for FloatNumber {
+    type Output = FloatNumber;
+    fn mul(self, rhs: FloatNumber) -> FloatNumber {
+        FloatNumber(self.0 * rhs.0)
+    }
 }
-impl Div for Float {
-    type Output = Float;
-    fn div(self, rhs: Float) -> Float { Float(self.0 / rhs.0) }
+impl Div for FloatNumber {
+    type Output = FloatNumber;
+    fn div(self, rhs: FloatNumber) -> FloatNumber {
+        FloatNumber(self.0 / rhs.0)
+    }
 }
-impl Rem for Float {
-    type Output = Float;
-    fn rem(self, rhs: Float) -> Float { Float(self.0 % rhs.0) }
+impl Rem for FloatNumber {
+    type Output = FloatNumber;
+    fn rem(self, rhs: FloatNumber) -> FloatNumber {
+        FloatNumber(self.0 % rhs.0)
+    }
 }
-impl Neg for Float {
-    type Output = Float;
-    fn neg(self) -> Float { Float(-self.0) }
+impl Neg for FloatNumber {
+    type Output = FloatNumber;
+    fn neg(self) -> FloatNumber {
+        FloatNumber(-self.0)
+    }
 }
-impl std::fmt::Display for Float {
+impl std::fmt::Display for FloatNumber {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.0)
     }
 }
-impl Eq for Float {}
-impl Ord for Float {
+impl Eq for FloatNumber {}
+impl Ord for FloatNumber {
     fn cmp(&self, other: &Self) -> Ordering {
         self.partial_cmp(other).unwrap_or(Ordering::Equal)
     }
 }
-impl Hash for Float {
+impl Hash for FloatNumber {
     fn hash<H: Hasher>(&self, state: &mut H) {
         // Not ideal for NaN, but works for most cases
         state.write_u64(self.0.to_bits());
@@ -95,7 +122,9 @@ impl Hash for Float {
 pub struct StringValue(pub String);
 
 impl StringValue {
-    pub fn new(s: String) -> Self { StringValue(s) }
+    pub fn new(s: String) -> Self {
+        StringValue(s)
+    }
     pub fn repeat(&self, n: usize) -> StringValue {
         StringValue(self.0.repeat(n))
     }
@@ -119,11 +148,15 @@ impl std::fmt::Display for StringValue {
 pub struct BooleanValue(pub bool);
 
 impl BooleanValue {
-    pub fn new(b: bool) -> Self { BooleanValue(b) }
+    pub fn new(b: bool) -> Self {
+        BooleanValue(b)
+    }
 }
 impl Not for BooleanValue {
     type Output = BooleanValue;
-    fn not(self) -> BooleanValue { BooleanValue(!self.0) }
+    fn not(self) -> BooleanValue {
+        BooleanValue(!self.0)
+    }
 }
 impl std::fmt::Display for BooleanValue {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -136,17 +169,17 @@ pub type Dict = HashMap<String, Value>;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Value {
-    Number(Number),
-    Float(Float),
+    Integer(Integer),
+    Float(FloatNumber),
     String(StringValue),
     Boolean(BooleanValue),
     Array(Array),
     Dict(Dict),
     Undefined,
     Function {
-        params: Vec<String>,
+        parameters: Vec<String>,
         body: String,
-        env: Dict,
+        environment: Dict,
     },
 }
 
@@ -155,31 +188,31 @@ pub type BuiltinFn = fn(args: &[Value]) -> Value;
 impl std::fmt::Display for Value {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Value::Number(Number(n)) => write!(f, "{}", n),
-            Value::Float(Float(n)) => write!(f, "{}", n),
+            Value::Integer(Integer(n)) => write!(f, "{}", n),
+            Value::Float(FloatNumber(n)) => write!(f, "{}", n),
             Value::String(StringValue(s)) => write!(f, "{}", s),
             Value::Boolean(BooleanValue(b)) => write!(f, "{}", b),
-            Value::Array(a) => {
+            Value::Array(array) => {
                 write!(f, "[")?;
-                let mut first = true;
-                for item in a {
-                    if !first {
+                let mut is_first = true;
+                for element in array {
+                    if !is_first {
                         write!(f, ", ")?;
                     }
-                    write!(f, "{}", item)?;
-                    first = false;
+                    write!(f, "{}", element)?;
+                    is_first = false;
                 }
                 write!(f, "]")
             }
-            Value::Dict(d) => {
+            Value::Dict(dict) => {
                 write!(f, "{{")?;
-                let mut first = true;
-                for (key, val) in d {
-                    if !first {
+                let mut is_first = true;
+                for (key, value) in dict {
+                    if !is_first {
                         write!(f, ", ")?;
                     }
-                    write!(f, "\"{}\": {}", key, val)?;
-                    first = false;
+                    write!(f, "\"{}\": {}", key, value)?;
+                    is_first = false;
                 }
                 write!(f, "}}")
             }

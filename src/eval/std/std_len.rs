@@ -1,12 +1,12 @@
 // Handles the TungLang len() built-in function
-use crate::value::{Value, Number, StringValue};
+use crate::value::{Integer, StringValue, Value};
 
 /// Returns the length of a string, array, or dict
 pub fn std_len(val: &Value) -> Value {
     match val {
-        Value::String(s) => Value::Number(Number(s.len() as i64)),
-        Value::Array(arr) => Value::Number(Number(arr.len() as i64)),
-        Value::Dict(map) => Value::Number(Number(map.len() as i64)),
+        Value::String(string_value) => Value::Integer(Integer(string_value.len() as i64)),
+        Value::Array(array) => Value::Integer(Integer(array.len() as i64)),
+        Value::Dict(dictionary) => Value::Integer(Integer(dictionary.len() as i64)),
         _ => Value::Undefined,
     }
 }

@@ -1,11 +1,11 @@
 // Handles the TungLang print() built-in function
-use crate::value::{Value, Number, Float, StringValue, BooleanValue};
+use crate::value::{BooleanValue, Float, Integer, StringValue, Value};
 
 /// Prints a Value to stdout
 pub fn std_print(val: &Value) {
     match val {
         Value::String(s) => println!("{}", s),
-        Value::Number(n) => println!("{}", n),
+        Value::Integer(n) => println!("{}", n),
         Value::Float(f) => println!("{}", f),
         Value::Boolean(b) => println!("{}", b),
         Value::Array(arr) => println!("{:?}", arr),

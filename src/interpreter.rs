@@ -1,7 +1,7 @@
 use crate::eval::evaluate_expression::evaluate_expression;
 use crate::parser::Rule;
 use crate::stdlib::StdLib;
-use crate::value::{Value, Number, Float, StringValue, BooleanValue, Array, Dict};
+use crate::value::{Array, BooleanValue, Dict, FloatNumber, Integer, StringValue, Value};
 use pest::iterators::{Pair, Pairs};
 use std::collections::HashMap;
 
@@ -61,12 +61,12 @@ fn execute_statement(
             let mut inner: Pairs<Rule> = pair.into_inner();
             let value: Value = evaluate_expression(inner.next().unwrap(), variables, stdlib)?;
             match value {
-                Value::String(s) => println!("{}", s),
-                Value::Number(n) => println!("{}", n),
-                Value::Float(f) => println!("{}", f),
-                Value::Boolean(b) => println!("{}", b),
-                Value::Array(arr) => println!("{:?}", arr),
-                Value::Dict(map) => println!("{:?}", map),
+                Value::String(string_value) => println!("{}", string_value),
+                Value::Integer(integer_value) => println!("{}", integer_value),
+                Value::FloatNumber(float_value) => println!("{}", float_value),
+                Value::Boolean(boolean_value) => println!("{}", boolean_value),
+                Value::Array(array) => println!("{:?}", array),
+                Value::Dict(dictionary) => println!("{:?}", dictionary),
                 Value::Function { .. } => println!("<function>"),
                 Value::Undefined => {
                     return Err(miette::miette!("Attempted to print an undefined value."))
@@ -97,14 +97,14 @@ fn execute_statement(
         Rule::function_definition => {
             let mut inner = pair.into_inner();
             let fn_name = inner.next().unwrap().as_str().to_string();
-            let mut params = Vec::new();
+            let mut parameters = Vec::new();
             let mut body = None;
             if let Some(next) = inner.next() {
                 if next.as_rule() == Rule::IDENTIFIER {
                     // At least one parameter
-                    params.push(next.as_str().to_string());
+                    parameters.push(next.as_str().to_string());
                     for p in next.into_inner() {
-                        params.push(p.as_str().to_string());
+                        parameters.push(p.as_str().to_string());
                     }
                     // The next item must be the body
                     if let Some(b) = inner.next() {
@@ -119,9 +119,9 @@ fn execute_statement(
                 variables.insert(
                     fn_name,
                     Value::Function {
-                        params,
+                        parameters,
                         body: body_str,
-                        env: variables.clone(),
+                        environment: variables.clone(),
                     },
                 );
             }
@@ -137,12 +137,12 @@ fn execute_statement(
 
 fn is_truthy(value: Value) -> bool {
     match value {
-        Value::Number(n) => n.0 != 0,
-        Value::Float(f) => f.0 != 0.0,
-        Value::String(s) => !s.0.is_empty(),
-        Value::Boolean(b) => b.0,
-        Value::Array(ref arr) => !arr.is_empty(),
-        Value::Dict(ref map) => !map.is_empty(),
+        Value::Integer(integer_value) => integer_value.0 != 0,
+        Value::FloatNumber(float_value) => float_value.0 != 0.0,
+        Value::String(string_value) => !string_value.0.is_empty(),
+        Value::Boolean(boolean_value) => boolean_value.0,
+        Value::Array(ref array) => !array.is_empty(),
+        Value::Dict(ref dictionary) => !dictionary.is_empty(),
         Value::Undefined => false,
         Value::Function { .. } => false,
     }

@@ -1,6 +1,6 @@
 // file: /home/kaiden/RustroverProjects/TungLang/src/eval/std_math.rs
 // Python-like math functions for TungLang
-use crate::value::{Value, Number, Float, StringValue, BooleanValue};
+use crate::value::{BooleanValue, Float, Integer, StringValue, Value};
 
 // min function
 pub fn std_min(args: &[Value]) -> Value {
@@ -18,15 +18,19 @@ pub fn std_min(args: &[Value]) -> Value {
 
             for value in array {
                 match (value, &min_value) {
-                    (Value::Number(Number(n1)), Value::Number(Number(n2))) if n1 < n2 => min_value = value.clone(),
-                    (Value::Float(Float(f1)), Value::Float(Float(f2))) if f1 < f2 => min_value = value.clone(),
-                    (Value::Number(Number(n)), Value::Float(Float(f))) if (*n as f64) < *f => {
+                    (Value::Integer(Integer(n1)), Value::Integer(Integer(n2))) if n1 < n2 => {
                         min_value = value.clone()
                     }
-                    (Value::Float(Float(f)), Value::Number(Number(n))) if *f < (*n as f64) => {
+                    (Value::Float(Float(f1)), Value::Float(Float(f2))) if f1 < f2 => {
                         min_value = value.clone()
                     }
-                    (Value::StringValue(StringValue(s1)), Value::StringValue(StringValue(s2))) if s1 < s2 => min_value = value.clone(),
+                    (Value::Integer(Integer(n)), Value::Float(Float(f))) if (*n as f64) < *f => {
+                        min_value = value.clone()
+                    }
+                    (Value::Float(Float(f)), Value::Integer(Integer(n))) if *f < (*n as f64) => {
+                        min_value = value.clone()
+                    }
+                    (Value::String(s1), Value::String(s2)) if s1 < s2 => min_value = value.clone(),
                     _ => {}
                 }
             }
@@ -39,15 +43,19 @@ pub fn std_min(args: &[Value]) -> Value {
 
             for value in args {
                 match (value, &min_value) {
-                    (Value::Number(Number(n1)), Value::Number(Number(n2))) if n1 < n2 => min_value = value.clone(),
-                    (Value::Float(Float(f1)), Value::Float(Float(f2))) if f1 < f2 => min_value = value.clone(),
-                    (Value::Number(Number(n)), Value::Float(Float(f))) if (*n as f64) < *f => {
+                    (Value::Integer(Integer(n1)), Value::Integer(Integer(n2))) if n1 < n2 => {
                         min_value = value.clone()
                     }
-                    (Value::Float(Float(f)), Value::Number(Number(n))) if *f < (*n as f64) => {
+                    (Value::Float(Float(f1)), Value::Float(Float(f2))) if f1 < f2 => {
                         min_value = value.clone()
                     }
-                    (Value::StringValue(StringValue(s1)), Value::StringValue(StringValue(s2))) if s1 < s2 => min_value = value.clone(),
+                    (Value::Integer(Integer(n)), Value::Float(Float(f))) if (*n as f64) < *f => {
+                        min_value = value.clone()
+                    }
+                    (Value::Float(Float(f)), Value::Integer(Integer(n))) if *f < (*n as f64) => {
+                        min_value = value.clone()
+                    }
+                    (Value::String(s1), Value::String(s2)) if s1 < s2 => min_value = value.clone(),
                     _ => {}
                 }
             }
@@ -73,15 +81,19 @@ pub fn std_max(args: &[Value]) -> Value {
 
             for value in array {
                 match (value, &max_value) {
-                    (Value::Number(Number(n1)), Value::Number(Number(n2))) if n1 > n2 => max_value = value.clone(),
-                    (Value::Float(Float(f1)), Value::Float(Float(f2))) if f1 > f2 => max_value = value.clone(),
-                    (Value::Number(Number(n)), Value::Float(Float(f))) if (*n as f64) > *f => {
+                    (Value::Integer(Integer(n1)), Value::Integer(Integer(n2))) if n1 > n2 => {
                         max_value = value.clone()
                     }
-                    (Value::Float(Float(f)), Value::Number(Number(n))) if *f > (*n as f64) => {
+                    (Value::Float(Float(f1)), Value::Float(Float(f2))) if f1 > f2 => {
                         max_value = value.clone()
                     }
-                    (Value::StringValue(StringValue(s1)), Value::StringValue(StringValue(s2))) if s1 > s2 => max_value = value.clone(),
+                    (Value::Integer(Integer(n)), Value::Float(Float(f))) if (*n as f64) > *f => {
+                        max_value = value.clone()
+                    }
+                    (Value::Float(Float(f)), Value::Integer(Integer(n))) if *f > (*n as f64) => {
+                        max_value = value.clone()
+                    }
+                    (Value::String(s1), Value::String(s2)) if s1 > s2 => max_value = value.clone(),
                     _ => {}
                 }
             }
@@ -94,15 +106,19 @@ pub fn std_max(args: &[Value]) -> Value {
 
             for value in args {
                 match (value, &max_value) {
-                    (Value::Number(Number(n1)), Value::Number(Number(n2))) if n1 > n2 => max_value = value.clone(),
-                    (Value::Float(Float(f1)), Value::Float(Float(f2))) if f1 > f2 => max_value = value.clone(),
-                    (Value::Number(Number(n)), Value::Float(Float(f))) if (*n as f64) > *f => {
+                    (Value::Integer(Integer(n1)), Value::Integer(Integer(n2))) if n1 > n2 => {
                         max_value = value.clone()
                     }
-                    (Value::Float(Float(f)), Value::Number(Number(n))) if *f > (*n as f64) => {
+                    (Value::Float(Float(f1)), Value::Float(Float(f2))) if f1 > f2 => {
                         max_value = value.clone()
                     }
-                    (Value::StringValue(StringValue(s1)), Value::StringValue(StringValue(s2))) if s1 > s2 => max_value = value.clone(),
+                    (Value::Integer(Integer(n)), Value::Float(Float(f))) if (*n as f64) > *f => {
+                        max_value = value.clone()
+                    }
+                    (Value::Float(Float(f)), Value::Integer(Integer(n))) if *f > (*n as f64) => {
+                        max_value = value.clone()
+                    }
+                    (Value::String(s1), Value::String(s2)) if s1 > s2 => max_value = value.clone(),
                     _ => {}
                 }
             }
@@ -115,13 +131,13 @@ pub fn std_max(args: &[Value]) -> Value {
 // sum function
 pub fn std_sum(args: &[Value]) -> Value {
     if args.is_empty() {
-        return Value::Number(Number(0));
+        return Value::Integer(Integer(0));
     }
 
     match &args[0] {
         Value::Array(array) => {
             if array.is_empty() {
-                return Value::Number(Number(0));
+                return Value::Integer(Integer(0));
             }
 
             let mut sum_int = 0i64;
@@ -130,7 +146,7 @@ pub fn std_sum(args: &[Value]) -> Value {
 
             for value in array {
                 match value {
-                    Value::Number(Number(n)) => {
+                    Value::Integer(Integer(n)) => {
                         if is_float {
                             sum_float += *n as f64;
                         } else {
@@ -151,7 +167,7 @@ pub fn std_sum(args: &[Value]) -> Value {
             if is_float {
                 Value::Float(Float(sum_float))
             } else {
-                Value::Number(Number(sum_int))
+                Value::Integer(Integer(sum_int))
             }
         }
         _ => Value::Undefined,
@@ -167,7 +183,7 @@ pub fn std_round(args: &[Value]) -> Value {
     let value = &args[0];
     let digits = if args.len() > 1 {
         match &args[1] {
-            Value::Number(Number(n)) => *n,
+            Value::Integer(Integer(n)) => *n,
             _ => 0,
         }
     } else {
@@ -175,10 +191,10 @@ pub fn std_round(args: &[Value]) -> Value {
     };
 
     match value {
-        Value::Number(Number(n)) => Value::Number(Number(*n)),
+        Value::Integer(Integer(n)) => Value::Integer(Integer(*n)),
         Value::Float(Float(f)) => {
             if digits == 0 {
-                Value::Number(Number(f.round() as i64))
+                Value::Integer(Integer(f.round() as i64))
             } else {
                 let factor = 10.0f64.powi(digits as i32);
                 Value::Float(Float((f * factor).round() / factor))

@@ -1,7 +1,7 @@
 use crate::interpreter::execute_block;
 use crate::parser::Rule;
 use crate::stdlib::StdLib;
-use crate::value::{Value, Number, Float, StringValue, BooleanValue, Array, Dict};
+use crate::value::{Array, BooleanValue, Dict, FloatNumber, Integer, StringValue, Value};
 use pest::iterators::{Pair, Pairs};
 use pest::Parser;
 use std::collections::HashMap;
@@ -17,9 +17,9 @@ pub fn evaluate_expression(
         Rule::number => {
             let s: &str = pair.as_str();
             if s.contains('.') {
-                Ok(Value::Float(Float(s.parse::<f64>().unwrap())))
+                Ok(Value::FloatNumber(FloatNumber(s.parse::<f64>().unwrap())))
             } else {
-                Ok(Value::Number(Number(s.parse::<i64>().unwrap())))
+                Ok(Value::Integer(Integer(s.parse::<i64>().unwrap())))
             }
         }
         Rule::string => {
@@ -29,8 +29,8 @@ pub fn evaluate_expression(
         Rule::IDENTIFIER => {
             let name: &str = pair.as_str();
             match variables.get(name).cloned() {
-                Some(val) => Ok(val),
-                None => Err(miette::miette!(
+                Some(value) => Ok(value),
+                none => Err(miette::miette!(
                     "Error: Variable '{}' is not defined.",
                     name
                 )),
@@ -46,11 +46,16 @@ pub fn evaluate_expression(
             if let Some(func) = stdlib.get(func_name) {
                 let result = func(&args);
                 Ok(result)
-            } else if let Some(Value::Function { params, body, env }) = variables.get(func_name) {
-                let mut local_vars: Dict = env.clone();
-                for (i, param) in params.iter().enumerate() {
+            } else if let Some(Value::Function {
+                parameters,
+                body,
+                environment,
+            }) = variables.get(func_name)
+            {
+                let mut local_vars: Dict = environment.clone();
+                for (i, parameter) in parameters.iter().enumerate() {
                     if let Some(arg) = args.get(i) {
-                        local_vars.insert(param.clone(), arg.clone());
+                        local_vars.insert(parameter.clone(), arg.clone());
                     }
                 }
                 let parse_result = crate::parser::TungParser::parse(Rule::block, &body);
@@ -63,11 +68,15 @@ pub fn evaluate_expression(
                                 let msg = e.to_string();
                                 if msg.starts_with("__RETURN__") {
                                     let return_str = msg.trim_start_matches("__RETURN__").trim();
-                                    let parse_result = crate::parser::TungParser::parse(Rule::expression, return_str);
+                                    let parse_result = crate::parser::TungParser::parse(
+                                        Rule::expression,
+                                        return_str,
+                                    );
                                     match parse_result {
                                         Ok(mut pairs) => {
                                             let expr = pairs.next().unwrap();
-                                            let val = evaluate_expression(expr, &local_vars, stdlib)?;
+                                            let val =
+                                                evaluate_expression(expr, &local_vars, stdlib)?;
                                             Ok(val)
                                         }
                                         Err(_) => Ok(Value::Undefined),

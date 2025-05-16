@@ -109,7 +109,7 @@ string = @{ "\"" ~ (escape_sequence | (!"\"" ~ ANY))* ~ "\"" }
 // Escape sequences: \", \n, \t, \r, \\, \0
 escape_sequence = _{ "\\" ~ ("\"" | "n" | "t" | "r" | "\\" | "0") }
 
-// Number: digits with optional decimal point
+// Integer: digits with optional decimal point
 number = @{ ASCII_DIGIT+ ~ ("." ~ ASCII_DIGIT+)? }
 
 // Array: [expr, expr, ...]

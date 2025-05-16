@@ -1,6 +1,6 @@
 // file: /home/kaiden/RustroverProjects/TungLang/src/eval/std_list.rs
 // Python-like list functions for TungLang
-use crate::value::{Value, Number, Float, StringValue, BooleanValue};
+use crate::value::{BooleanValue, FloatNumber, Integer, StringValue, Value};
 
 // append function (modifies list in-place like Python's list.append())
 pub fn std_append(args: &[Value]) -> Value {
@@ -24,7 +24,7 @@ pub fn std_insert(args: &[Value]) -> Value {
     }
 
     match (args[0].clone(), &args[1]) {
-        (Value::Array(mut arr), Value::Number(Number(idx))) => {
+        (Value::Array(mut arr), Value::Integer(Integer(idx))) => {
             let index = if *idx < 0 {
                 arr.len().saturating_sub(idx.unsigned_abs() as usize)
             } else {
@@ -46,28 +46,30 @@ pub fn std_pop(args: &[Value]) -> Value {
     }
 
     match args[0].clone() {
-        Value::Array(mut arr) => {
-            if arr.is_empty() {
+        Value::Array(mut array) => {
+            if array.is_empty() {
                 return Value::Undefined;
             }
 
             let idx = if args.len() > 1 {
-                match args[1] {
-                    Value::Number(Number(n)) => {
-                        if n < 0 {
-                            arr.len().saturating_sub(n.unsigned_abs() as usize)
+                match &args[1] {
+                    Value::Integer(Integer(index_value)) => {
+                        if *index_value < 0 {
+                            array
+                                .len()
+                                .saturating_sub(index_value.unsigned_abs() as usize)
                         } else {
-                            n as usize
+                            *index_value as usize
                         }
                     }
-                    _ => arr.len() - 1,
+                    _ => array.len() - 1,
                 }
             } else {
-                arr.len() - 1
+                array.len() - 1
             };
 
-            if idx < arr.len() {
-                let removed = arr.remove(idx);
+            if idx < array.len() {
+                let removed = array.remove(idx);
                 removed
             } else {
                 Value::Undefined
@@ -84,22 +86,22 @@ pub fn std_index(args: &[Value]) -> Value {
     }
 
     match &args[0] {
-        Value::Array(arr) => {
-            for (i, item) in arr.iter().enumerate() {
+        Value::Array(array) => {
+            for (i, item) in array.iter().enumerate() {
                 if item == &args[1] {
-                    return Value::Number(Number(i as i64));
+                    return Value::Integer(Integer(i as i64));
                 }
             }
-            Value::Number(Number(-1))
+            Value::Integer(Integer(-1))
         }
-        Value::String(s) => {
-            if let Value::String(substr) = &args[1] {
-                match s.0.find(&substr.0) {
-                    Some(idx) => Value::Number(Number(idx as i64)),
-                    None => Value::Number(Number(-1)),
+        Value::String(string_value) => {
+            if let Value::String(substring_value) = &args[1] {
+                match string_value.0.find(&substring_value.0) {
+                    Some(idx) => Value::Integer(Integer(idx as i64)),
+                    _ => Value::Integer(Integer(-1)),
                 }
             } else {
-                Value::Number(Number(-1))
+                Value::Integer(Integer(-1))
             }
         }
         _ => Value::Undefined,
@@ -113,22 +115,22 @@ pub fn std_sort(args: &[Value]) -> Value {
     }
 
     match args[0].clone() {
-        Value::Array(mut arr) => {
-            arr.sort_by(|a, b| match (a, b) {
-                (Value::Number(Number(n1)), Value::Number(Number(n2))) => n1.cmp(n2),
-                (Value::Float(Float(f1)), Value::Float(Float(f2))) => {
+        Value::Array(mut array) => {
+            array.sort_by(|a, b| match (a, b) {
+                (Value::Integer(Integer(n1)), Value::Integer(Integer(n2))) => n1.cmp(n2),
+                (Value::FloatNumber(FloatNumber(f1)), Value::FloatNumber(FloatNumber(f2))) => {
                     f1.partial_cmp(f2).unwrap_or(std::cmp::Ordering::Equal)
                 }
-                (Value::Number(Number(n)), Value::Float(Float(f))) => (*n as f64)
+                (Value::Integer(Integer(n)), Value::FloatNumber(FloatNumber(f))) => (*n as f64)
                     .partial_cmp(f)
                     .unwrap_or(std::cmp::Ordering::Equal),
-                (Value::Float(Float(f)), Value::Number(Number(n))) => f
+                (Value::FloatNumber(FloatNumber(f)), Value::Integer(Integer(n))) => f
                     .partial_cmp(&(*n as f64))
                     .unwrap_or(std::cmp::Ordering::Equal),
-                (Value::String(s1), Value::String(s2)) => s1.cmp(s2),
+                (Value::String(string1), Value::String(string2)) => string1.cmp(string2),
                 _ => std::cmp::Ordering::Equal,
             });
-            Value::Array(arr)
+            Value::Array(array)
         }
         _ => Value::Undefined,
     }
