@@ -170,7 +170,7 @@ pub type Dict = HashMap<String, Value>;
 #[derive(Debug, Clone, PartialEq)]
 pub enum Value {
     Integer(Integer),
-    Float(FloatNumber),
+    FloatNumber(FloatNumber),
     String(StringValue),
     Boolean(BooleanValue),
     Array(Array),
@@ -189,7 +189,7 @@ impl std::fmt::Display for Value {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Value::Integer(Integer(n)) => write!(f, "{}", n),
-            Value::Float(FloatNumber(n)) => write!(f, "{}", n),
+            Value::FloatNumber(FloatNumber(n)) => write!(f, "{}", n),
             Value::String(StringValue(s)) => write!(f, "{}", s),
             Value::Boolean(BooleanValue(b)) => write!(f, "{}", b),
             Value::Array(array) => {

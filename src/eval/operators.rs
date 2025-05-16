@@ -4,59 +4,93 @@ use miette::Result;
 
 /// Applies a binary operator to two Values
 pub fn apply_operator(left: Value, right: Value, op: &str) -> Result<Value> {
-    use crate::value::{BooleanValue, Float, Integer, StringValue};
+    use crate::value::{BooleanValue, FloatNumber, Integer, StringValue};
     match (left.clone(), right.clone(), op) {
         // Arithmetic - Python-like behavior with auto-promotion to float
         (Value::Integer(l), Value::Integer(r), "+") => Ok(Value::Integer(l + r)),
         (Value::Integer(l), Value::Integer(r), "-") => Ok(Value::Integer(l - r)),
         (Value::Integer(l), Value::Integer(r), "*") => Ok(Value::Integer(l * r)),
         (Value::Integer(l), Value::Integer(r), "/") => {
-            Ok(Value::Float(Float(l.0 as f64 / r.0 as f64)))
+            Ok(Value::FloatNumber(FloatNumber(l.0 as f64 / r.0 as f64)))
         } // Division always returns float in Python
         (Value::Integer(l), Value::Integer(r), "//") => Ok(Value::Integer(Integer(l.0 / r.0))), // Floor division
         (Value::Integer(l), Value::Integer(r), "%") => Ok(Value::Integer(Integer(l.0 % r.0))),
-        (Value::Integer(l), Value::Integer(r), "**") => {
-            Ok(Value::Float(Float((l.0 as f64).powf(r.0 as f64))))
-        } // Exponentiation
+        (Value::Integer(l), Value::Integer(r), "**") => Ok(Value::FloatNumber(FloatNumber(
+            (l.0 as f64).powf(r.0 as f64),
+        ))), // Exponentiation
 
         // Mixed number and float operations (auto-promotion)
-        (Value::Integer(l), Value::Float(r), "+") => Ok(Value::Float(Float(l.0 as f64 + r.0))),
-        (Value::Integer(l), Value::Float(r), "-") => Ok(Value::Float(Float(l.0 as f64 - r.0))),
-        (Value::Integer(l), Value::Float(r), "*") => Ok(Value::Float(Float(l.0 as f64 * r.0))),
-        (Value::Integer(l), Value::Float(r), "/") => Ok(Value::Float(Float(l.0 as f64 / r.0))),
-        (Value::Integer(l), Value::Float(r), "//") => {
+        (Value::Integer(l), Value::FloatNumber(r), "+") => {
+            Ok(Value::FloatNumber(FloatNumber(l.0 as f64 + r.0)))
+        }
+        (Value::Integer(l), Value::FloatNumber(r), "-") => {
+            Ok(Value::FloatNumber(FloatNumber(l.0 as f64 - r.0)))
+        }
+        (Value::Integer(l), Value::FloatNumber(r), "*") => {
+            Ok(Value::FloatNumber(FloatNumber(l.0 as f64 * r.0)))
+        }
+        (Value::Integer(l), Value::FloatNumber(r), "/") => {
+            Ok(Value::FloatNumber(FloatNumber(l.0 as f64 / r.0)))
+        }
+        (Value::Integer(l), Value::FloatNumber(r), "//") => {
             Ok(Value::Integer(Integer((l.0 as f64 / r.0).floor() as i64)))
         }
-        (Value::Integer(l), Value::Float(r), "%") => Ok(Value::Float(Float((l.0 as f64) % r.0))),
-        (Value::Integer(l), Value::Float(r), "**") => {
-            Ok(Value::Float(Float((l.0 as f64).powf(r.0))))
+        (Value::Integer(l), Value::FloatNumber(r), "%") => {
+            Ok(Value::FloatNumber(FloatNumber((l.0 as f64) % r.0)))
+        }
+        (Value::Integer(l), Value::FloatNumber(r), "**") => {
+            Ok(Value::FloatNumber(FloatNumber((l.0 as f64).powf(r.0))))
         }
 
-        (Value::Float(l), Value::Integer(r), "+") => Ok(Value::Float(Float(l.0 + r.0 as f64))),
-        (Value::Float(l), Value::Integer(r), "-") => Ok(Value::Float(Float(l.0 - r.0 as f64))),
-        (Value::Float(l), Value::Integer(r), "*") => Ok(Value::Float(Float(l.0 * r.0 as f64))),
-        (Value::Float(l), Value::Integer(r), "/") => Ok(Value::Float(Float(l.0 / r.0 as f64))),
-        (Value::Float(l), Value::Integer(r), "//") => {
+        (Value::FloatNumber(l), Value::Integer(r), "+") => {
+            Ok(Value::FloatNumber(FloatNumber(l.0 + r.0 as f64)))
+        }
+        (Value::FloatNumber(l), Value::Integer(r), "-") => {
+            Ok(Value::FloatNumber(FloatNumber(l.0 - r.0 as f64)))
+        }
+        (Value::FloatNumber(l), Value::Integer(r), "*") => {
+            Ok(Value::FloatNumber(FloatNumber(l.0 * r.0 as f64)))
+        }
+        (Value::FloatNumber(l), Value::Integer(r), "/") => {
+            Ok(Value::FloatNumber(FloatNumber(l.0 / r.0 as f64)))
+        }
+        (Value::FloatNumber(l), Value::Integer(r), "//") => {
             Ok(Value::Integer(Integer((l.0 / r.0 as f64).floor() as i64)))
         }
-        (Value::Float(l), Value::Integer(r), "%") => Ok(Value::Float(Float(l.0 % r.0 as f64))),
-        (Value::Float(l), Value::Integer(r), "**") => Ok(Value::Float(Float(l.0.powf(r.0 as f64)))),
+        (Value::FloatNumber(l), Value::Integer(r), "%") => {
+            Ok(Value::FloatNumber(FloatNumber(l.0 % r.0 as f64)))
+        }
+        (Value::FloatNumber(l), Value::Integer(r), "**") => {
+            Ok(Value::FloatNumber(FloatNumber(l.0.powf(r.0 as f64))))
+        }
 
-        (Value::Float(l), Value::Float(r), "+") => Ok(Value::Float(Float(l.0 + r.0))),
-        (Value::Float(l), Value::Float(r), "-") => Ok(Value::Float(Float(l.0 - r.0))),
-        (Value::Float(l), Value::Float(r), "*") => Ok(Value::Float(Float(l.0 * r.0))),
-        (Value::Float(l), Value::Float(r), "/") => Ok(Value::Float(Float(l.0 / r.0))),
-        (Value::Float(l), Value::Float(r), "//") => {
+        (Value::FloatNumber(l), Value::FloatNumber(r), "+") => {
+            Ok(Value::FloatNumber(FloatNumber(l.0 + r.0)))
+        }
+        (Value::FloatNumber(l), Value::FloatNumber(r), "-") => {
+            Ok(Value::FloatNumber(FloatNumber(l.0 - r.0)))
+        }
+        (Value::FloatNumber(l), Value::FloatNumber(r), "*") => {
+            Ok(Value::FloatNumber(FloatNumber(l.0 * r.0)))
+        }
+        (Value::FloatNumber(l), Value::FloatNumber(r), "/") => {
+            Ok(Value::FloatNumber(FloatNumber(l.0 / r.0)))
+        }
+        (Value::FloatNumber(l), Value::FloatNumber(r), "//") => {
             Ok(Value::Integer(Integer((l.0 / r.0).floor() as i64)))
         }
-        (Value::Float(l), Value::Float(r), "%") => Ok(Value::Float(Float(l.0 % r.0))),
-        (Value::Float(l), Value::Float(r), "**") => Ok(Value::Float(Float(l.0.powf(r.0)))),
+        (Value::FloatNumber(l), Value::FloatNumber(r), "%") => {
+            Ok(Value::FloatNumber(FloatNumber(l.0 % r.0)))
+        }
+        (Value::FloatNumber(l), Value::FloatNumber(r), "**") => {
+            Ok(Value::FloatNumber(FloatNumber(l.0.powf(r.0))))
+        }
         // String concatenation and Python-like string operations
         (Value::String(l), Value::String(r), "+") => Ok(Value::String(l + &r)),
         (Value::String(l), Value::Integer(r), "+") => {
             Ok(Value::String(l + &StringValue(r.0.to_string())))
         }
-        (Value::String(l), Value::Float(r), "+") => {
+        (Value::String(l), Value::FloatNumber(r), "+") => {
             Ok(Value::String(l + &StringValue(r.0.to_string())))
         }
         (Value::String(l), Value::Boolean(r), "+") => {
@@ -75,7 +109,7 @@ pub fn apply_operator(left: Value, right: Value, op: &str) -> Result<Value> {
         (Value::Integer(l), Value::String(r), "+") => {
             Ok(Value::String(StringValue(l.0.to_string()) + &r))
         }
-        (Value::Float(l), Value::String(r), "+") => {
+        (Value::FloatNumber(l), Value::String(r), "+") => {
             Ok(Value::String(StringValue(l.0.to_string()) + &r))
         }
         (Value::Boolean(l), Value::String(r), "+") => {
@@ -145,12 +179,16 @@ pub fn apply_operator(left: Value, right: Value, op: &str) -> Result<Value> {
         }
         // Equality
         (Value::Integer(l), Value::Integer(r), "==") => Ok(Value::Boolean(BooleanValue(l == r))),
-        (Value::Float(l), Value::Float(r), "==") => Ok(Value::Boolean(BooleanValue(l == r))),
+        (Value::FloatNumber(l), Value::FloatNumber(r), "==") => {
+            Ok(Value::Boolean(BooleanValue(l == r)))
+        }
         (Value::String(l), Value::String(r), "==") => Ok(Value::Boolean(BooleanValue(l == r))),
         (Value::Boolean(l), Value::Boolean(r), "==") => Ok(Value::Boolean(BooleanValue(l == r))),
         // Inequality
         (Value::Integer(l), Value::Integer(r), "!=") => Ok(Value::Boolean(BooleanValue(l != r))),
-        (Value::Float(l), Value::Float(r), "!=") => Ok(Value::Boolean(BooleanValue(l != r))),
+        (Value::FloatNumber(l), Value::FloatNumber(r), "!=") => {
+            Ok(Value::Boolean(BooleanValue(l != r)))
+        }
         (Value::String(l), Value::String(r), "!=") => Ok(Value::Boolean(BooleanValue(l != r))),
         (Value::Boolean(l), Value::Boolean(r), "!=") => Ok(Value::Boolean(BooleanValue(l != r))),
         // Comparison
@@ -164,7 +202,9 @@ pub fn apply_operator(left: Value, right: Value, op: &str) -> Result<Value> {
             };
             Ok(Value::Boolean(BooleanValue(res)))
         }
-        (Value::Float(l), Value::Float(r), op) if matches!(op, ">" | "<" | ">=" | "<=") => {
+        (Value::FloatNumber(l), Value::FloatNumber(r), op)
+            if matches!(op, ">" | "<" | ">=" | "<=") =>
+        {
             let res = match op {
                 ">" => l > r,
                 "<" => l < r,
@@ -194,9 +234,9 @@ pub fn apply_operator(left: Value, right: Value, op: &str) -> Result<Value> {
         // Unary
         (Value::Boolean(l), Value::Undefined, "!") => Ok(Value::Boolean(!l)),
         (Value::Integer(l), Value::Undefined, "-") => Ok(Value::Integer(-l)),
-        (Value::Float(l), Value::Undefined, "-") => Ok(Value::Float(-l)),
+        (Value::FloatNumber(l), Value::Undefined, "-") => Ok(Value::FloatNumber(-l)),
         // Type conversion for comparison (Python allows comparing different numeric types)
-        (Value::Integer(l), Value::Float(r), op)
+        (Value::Integer(l), Value::FloatNumber(r), op)
             if matches!(op, "==" | "!=" | ">" | "<" | ">=" | "<=") =>
         {
             let left = l.0 as f64;
@@ -211,7 +251,7 @@ pub fn apply_operator(left: Value, right: Value, op: &str) -> Result<Value> {
             };
             Ok(Value::Boolean(BooleanValue(result)))
         }
-        (Value::Float(l), Value::Integer(r), op)
+        (Value::FloatNumber(l), Value::Integer(r), op)
             if matches!(op, "==" | "!=" | ">" | "<" | ">=" | "<=") =>
         {
             let right = r.0 as f64;

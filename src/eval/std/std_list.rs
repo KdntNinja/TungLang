@@ -1,6 +1,5 @@
-// file: /home/kaiden/RustroverProjects/TungLang/src/eval/std_list.rs
 // Python-like list functions for TungLang
-use crate::value::{BooleanValue, FloatNumber, Integer, StringValue, Value};
+use crate::value::{FloatNumber, Integer, Value};
 
 // append function (modifies list in-place like Python's list.append())
 pub fn std_append(args: &[Value]) -> Value {

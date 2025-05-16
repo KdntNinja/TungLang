@@ -1,5 +1,5 @@
 // Handles the TungLang len() built-in function
-use crate::value::{Integer, StringValue, Value};
+use crate::value::{Integer, Value};
 
 /// Returns the length of a string, array, or dict
 pub fn std_len(val: &Value) -> Value {

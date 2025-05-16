@@ -1,10 +1,9 @@
 use crate::interpreter::execute_block;
 use crate::parser::Rule;
 use crate::stdlib::StdLib;
-use crate::value::{Array, BooleanValue, Dict, FloatNumber, Integer, StringValue, Value};
+use crate::value::{Array, Dict, FloatNumber, Integer, StringValue, Value};
 use pest::iterators::{Pair, Pairs};
 use pest::Parser;
-use std::collections::HashMap;
 
 pub fn evaluate_expression(
     pair: Pair<Rule>,

@@ -7,9 +7,7 @@ use crate::eval::std::std_list;
 use crate::eval::std::std_math;
 use crate::eval::std::std_print::std_print;
 use crate::eval::std::std_range;
-use crate::value::{
-    Array, BooleanValue, BuiltinFn, Dict, FloatNumber, Integer, StringValue, Value,
-};
+use crate::value::{BuiltinFn, Integer, StringValue, Value};
 use std::collections::HashMap;
 
 pub struct StdLib {
